@@ -9,14 +9,16 @@
 export const Log = async (stack, level, pkg, message) => {
   try {
 
-    const apiUrl = import.meta.env?.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/logs` : (process.env.LOG_API_URL || 'https://api.example.com/logs');
-    const token = import.meta.env?.VITE_AUTH_TOKEN || process.env.AUTH_TOKEN || 'YOUR_AUTH_TOKEN';
+    const apiUrl = import.meta.env?.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/logs` : (process.env.LOG_API_URL);
+    const rawToken = import.meta.env?.VITE_AUTH_TOKEN || process.env.AUTH_TOKEN;
+    // Remove quotes from token if they were included in the .env file
+    const token = rawToken.replace(/^["']|["']$/g, '');
 
     const payload = {
       timestamp: new Date().toISOString(),
-      stack,
-      level,
-      package: pkg,
+      stack: stack.toLowerCase(),
+      level: level.toLowerCase(),
+      package: pkg.toLowerCase(),
       message,
     };
 
