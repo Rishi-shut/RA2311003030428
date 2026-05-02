@@ -1,65 +1,78 @@
 import React, { useState } from 'react';
+import { Card, CardContent, Typography, Box, Chip, Badge } from '@mui/material';
 import Log from '../../../logging_middleware/logger';
-import '../styles/Notification.css';
 
 const NotificationCard = ({ notification }) => {
-  // Local state to track if this specific card has been seen
-  const [isSeen, setIsSeen] = useState(false);
+  const [isRead, setIsRead] = useState(false);
 
   if (!notification) return null;
 
-  // We check both "type", "notification_type" and "Type" to be flexible with the API response
+  // Map API fields safely
   const type = notification.type || notification.notification_type || notification.Type || 'Unknown';
   const message = notification.message || notification.Message;
   const timestamp = notification.timestamp || notification.Timestamp;
-  const id = notification.id || notification.ID || 'unknown';
 
-  // Format the date to be human readable
   const formattedDate = timestamp 
-    ? new Date(timestamp).toLocaleString() 
+    ? new Date(timestamp).toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      }) 
     : 'Unknown time';
 
-  // Determine a simple color code based on the notification type
-  const getTypeColor = (typeString) => {
-    switch (typeString.toLowerCase()) {
-      case 'placement': return '#4CAF50'; // Green
-      case 'event': return '#2196F3'; // Blue
-      case 'result': return '#FF9800'; // Orange
-      default: return '#757575'; // Grey
+  const getBadgeColor = (category) => {
+    switch (category.toLowerCase()) {
+      case 'placement': return 'success'; 
+      case 'event': return 'primary'; 
+      case 'result': return 'warning'; 
+      default: return 'default'; 
     }
   };
 
-  // Mark as seen on click
   const handleCardClick = () => {
-    if (!isSeen) {
-      setIsSeen(true);
-      // Optional: Log that a user interacted with a notification
+    if (!isRead) {
+      setIsRead(true);
       Log('frontend', 'info', 'component', 'User read notification');
     }
   };
 
   return (
-    <div 
-      className={`notification-card ${isSeen ? 'seen' : 'unseen'}`}
+    <Card 
       onClick={handleCardClick}
+      elevation={0}
+      sx={{ 
+        cursor: 'pointer',
+        mb: 2,
+        transition: 'all 0.2s',
+        opacity: isRead ? 0.65 : 1,
+        border: '1px solid #eaeaea',
+        borderLeft: isRead ? '1px solid #eaeaea' : '5px solid #f44336',
+        backgroundColor: isRead ? '#fafafa' : '#ffffff',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: 3
+        }
+      }}
     >
-      <div className="notification-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* Small visual red dot if it hasn't been seen yet */}
-          {!isSeen && <span className="unseen-dot"></span>}
-          <span 
-            className="notification-type" 
-            style={{ backgroundColor: getTypeColor(type) }}
-          >
-            {type}
-          </span>
-        </div>
-        <span className="notification-time">{formattedDate}</span>
-      </div>
-      <div className="notification-body">
-        <p>{message}</p>
-      </div>
-    </div>
+      <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            {!isRead && <Badge color="error" variant="dot" invisible={false} />}
+            <Chip 
+              label={type} 
+              color={getBadgeColor(type)} 
+              size="small" 
+              sx={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5 }} 
+            />
+          </Box>
+          <Typography variant="caption" color="text.secondary" fontWeight="medium">
+            {formattedDate}
+          </Typography>
+        </Box>
+        <Typography variant="body1" color="text.primary" sx={{ lineHeight: 1.6 }}>
+          {message}
+        </Typography>
+      </CardContent>
+    </Card>
   );
 };
 

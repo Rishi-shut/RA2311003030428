@@ -1,24 +1,24 @@
 import React from 'react';
+import { Box, Typography, Paper } from '@mui/material';
 import NotificationCard from './NotificationCard';
-import '../styles/Notification.css';
 
 const NotificationList = ({ notifications = [] }) => {
-  // Handle empty states gracefully
   if (!notifications || notifications.length === 0) {
     return (
-      <div className="notification-list-empty">
-        <p>No notifications available right now.</p>
-      </div>
+      <Paper elevation={0} sx={{ p: 5, textAlign: 'center', backgroundColor: '#fff', border: '1px dashed #ccc', borderRadius: 2 }}>
+        <Typography color="text.secondary" variant="body1">
+          No notifications available right now.
+        </Typography>
+      </Paper>
     );
   }
 
   return (
-    <div className="notification-list">
+    <Box>
       {notifications.map((notif, index) => (
-        // It's best practice to use a unique ID for the key, but we fall back to index if missing
-        <NotificationCard key={notif.id || index} notification={notif} />
+        <NotificationCard key={notif.id || notif.ID || index} notification={notif} />
       ))}
-    </div>
+    </Box>
   );
 };
 
