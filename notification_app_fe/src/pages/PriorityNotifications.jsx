@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, Fade } from '@mui/material';
 import Log from '../../../logging_middleware/logger';
 import { fetchNotifications } from '../services/api';
 import { getTopNotifications } from '../utils/priority';
@@ -16,14 +16,13 @@ function PriorityNotifications() {
         setIsLoading(true);
         setError(null);
         
-        // Fetch the maximum allowed batch
         const rawData = await fetchNotifications({ limit: 10 });
         const extractedList = Array.isArray(rawData) ? rawData : (rawData.notifications || rawData.data || []);
         
         setTopNotifications(getTopNotifications(extractedList)); 
         Log('frontend', 'info', 'page', 'PriorityNotifications loaded');
       } catch (err) {
-        setError(err.message || 'Failed to connect to the notification server.');
+        setError(err.message || 'Failed to connect to the server.');
         Log('frontend', 'error', 'page', 'PriorityNotifications failed');
       } finally {
         setIsLoading(false);
@@ -33,28 +32,32 @@ function PriorityNotifications() {
   }, []);
 
   return (
-    <Box>
-      <Typography variant="h5" component="h1" fontWeight="bold" gutterBottom sx={{ mb: 4 }}>
-        🔥 Top Priority Notifications
-      </Typography>
+    <Fade in={true} timeout={500}>
+      <Box>
+        <Typography variant="h4" component="h1" fontWeight={800} gutterBottom sx={{ mb: 1, letterSpacing: '-0.5px' }}>
+          Top Priority
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          The most important announcements you shouldn't miss.
+        </Typography>
 
-      {/* States */}
-      {isLoading && (
-        <Box display="flex" justifyContent="center" my={5}>
-          <CircularProgress />
-        </Box>
-      )}
+        {isLoading && (
+          <Box display="flex" justifyContent="center" my={8}>
+            <CircularProgress size={32} thickness={4} />
+          </Box>
+        )}
 
-      {error && !isLoading && (
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-        </Alert>
-      )}
+        {error && !isLoading && (
+          <Alert severity="error" sx={{ mb: 4, borderRadius: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-      {!isLoading && !error && (
-        <NotificationList notifications={topNotifications} />
-      )}
-    </Box>
+        {!isLoading && !error && (
+          <NotificationList notifications={topNotifications} />
+        )}
+      </Box>
+    </Fade>
   );
 }
 

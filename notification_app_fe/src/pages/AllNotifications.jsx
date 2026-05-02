@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Select, MenuItem, FormControl, InputLabel, Button, CircularProgress, Alert, Stack, Paper } from '@mui/material';
+import { Box, Typography, Select, MenuItem, FormControl, Button, CircularProgress, Alert, Stack, Fade } from '@mui/material';
 import Log from '../../../logging_middleware/logger';
 import { fetchNotifications } from '../services/api';
 import NotificationList from '../components/NotificationList';
@@ -25,7 +25,7 @@ function AllNotifications() {
         setNotifications(extractedList);
         Log('frontend', 'info', 'page', `AllNotifications loaded page ${page}`);
       } catch (err) {
-        setError(err.message || 'Failed to connect to the notification server.');
+        setError(err.message || 'Failed to connect to the server.');
         Log('frontend', 'error', 'page', 'AllNotifications failed to load');
       } finally {
         setIsLoading(false);
@@ -37,56 +37,64 @@ function AllNotifications() {
 
   const handleFilterChange = (e) => {
     setFilterType(e.target.value);
-    setPage(1); // Reset to first page
-    Log('frontend', 'info', 'page', `User filtered by ${e.target.value || 'All'}`);
+    setPage(1);
+    Log('frontend', 'info', 'page', `Filtered by ${e.target.value || 'All'}`);
   };
 
   return (
-    <Box>
-      <Typography variant="h5" component="h1" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-        📥 All Notifications
-      </Typography>
+    <Fade in={true} timeout={500}>
+      <Box>
+        <Typography variant="h4" component="h1" fontWeight={800} gutterBottom sx={{ mb: 4, letterSpacing: '-0.5px' }}>
+          Inbox
+        </Typography>
 
-      {/* Controls Bar */}
-      <Paper elevation={0} sx={{ p: 2, mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #eaeaea', borderRadius: 2 }}>
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Filter Category</InputLabel>
-          <Select value={filterType} label="Filter Category" onChange={handleFilterChange}>
-            <MenuItem value=""><em>All Types</em></MenuItem>
-            <MenuItem value="Placement">Placement</MenuItem>
-            <MenuItem value="Event">Event</MenuItem>
-            <MenuItem value="Result">Result</MenuItem>
-          </Select>
-        </FormControl>
-        
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Button variant="outlined" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
-            Previous
-          </Button>
-          <Typography fontWeight="bold" color="text.secondary">Page {page}</Typography>
-          <Button variant="outlined" disabled={notifications.length < ITEMS_PER_PAGE} onClick={() => setPage(p => p + 1)}>
-            Next
-          </Button>
-        </Stack>
-      </Paper>
-
-      {/* States */}
-      {isLoading && (
-        <Box display="flex" justifyContent="center" my={5}>
-          <CircularProgress />
+        {/* Clean, minimalist controls */}
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 4 }}>
+          <FormControl size="small" sx={{ minWidth: 140 }}>
+            <Select 
+              displayEmpty
+              value={filterType} 
+              onChange={handleFilterChange}
+              sx={{ bgcolor: '#fff', borderRadius: 2 }}
+            >
+              <MenuItem value=""><em>All Categories</em></MenuItem>
+              <MenuItem value="Placement">Placement</MenuItem>
+              <MenuItem value="Event">Event</MenuItem>
+              <MenuItem value="Result">Result</MenuItem>
+            </Select>
+          </FormControl>
+          
+          <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'center', sm: 'flex-end' }}>
+            <Button variant="outlined" size="small" disabled={page === 1} onClick={() => setPage(p => p - 1)} sx={{ borderRadius: 2 }}>
+              Prev
+            </Button>
+            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ minWidth: '60px', textAlign: 'center' }}>
+              Page {page}
+            </Typography>
+            <Button variant="outlined" size="small" disabled={notifications.length < ITEMS_PER_PAGE} onClick={() => setPage(p => p + 1)} sx={{ borderRadius: 2 }}>
+              Next
+            </Button>
+          </Stack>
         </Box>
-      )}
 
-      {error && !isLoading && (
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-        </Alert>
-      )}
+        {/* States */}
+        {isLoading && (
+          <Box display="flex" justifyContent="center" my={8}>
+            <CircularProgress size={32} thickness={4} />
+          </Box>
+        )}
 
-      {!isLoading && !error && (
-        <NotificationList notifications={notifications} />
-      )}
-    </Box>
+        {error && !isLoading && (
+          <Alert severity="error" sx={{ mb: 4, borderRadius: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {!isLoading && !error && (
+          <NotificationList notifications={notifications} />
+        )}
+      </Box>
+    </Fade>
   );
 }
 
