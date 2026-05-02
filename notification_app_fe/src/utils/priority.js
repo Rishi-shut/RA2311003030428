@@ -23,9 +23,9 @@ export const getTopNotifications = (notifications = []) => {
   // Create a copy so we don't mutate the original array
   const sorted = [...notifications].sort((a, b) => {
     // 1. Compare Priority
-    // We assume the type is stored in either a.type or a.notification_type
-    const typeA = a.type || a.notification_type;
-    const typeB = b.type || b.notification_type;
+    // We assume the type is stored in either a.type, a.notification_type, or a.Type
+    const typeA = a.type || a.notification_type || a.Type;
+    const typeB = b.type || b.notification_type || b.Type;
 
     // Default to 99 (lowest priority) if it's an unknown type
     const priorityA = PRIORITY_MAP[typeA] || 99;
@@ -37,8 +37,8 @@ export const getTopNotifications = (notifications = []) => {
 
     // 2. If priority is the same, compare timestamps (Newest First)
     // Fallback to 0 if no timestamp exists
-    const timeA = new Date(a.timestamp || 0).getTime();
-    const timeB = new Date(b.timestamp || 0).getTime();
+    const timeA = new Date(a.timestamp || a.Timestamp || 0).getTime();
+    const timeB = new Date(b.timestamp || b.Timestamp || 0).getTime();
 
     return timeB - timeA; // Descending: newer date comes first
   });

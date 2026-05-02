@@ -14,20 +14,17 @@ const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN?.replace(/^["']|["']$/g, '');
  * @param {string} [params.notification_type] - Filter by specific notification type
  * @returns {Promise<Object>} API response containing the notifications
  */
-export const fetchNotifications = async ({ limit = 10, page = 1, notification_type } = {}) => {
+export const fetchNotifications = async ({ limit, page, notification_type } = {}) => {
   try {
-    // 1. Build the query parameters dynamically
-    const queryParams = new URLSearchParams({
-      limit: limit.toString(),
-      page: page.toString(),
-    });
-    
-    if (notification_type) {
-      queryParams.append('notification_type', notification_type);
-    }
+    // 1. Build the query parameters dynamically only if provided
+    const queryParams = new URLSearchParams();
+    if (limit) queryParams.append('limit', limit.toString());
+    if (page) queryParams.append('page', page.toString());
+    if (notification_type) queryParams.append('notification_type', notification_type);
 
     // 2. Construct the full URL
-    const url = `${API_BASE_URL}/notifications?${queryParams.toString()}`;
+    const queryString = queryParams.toString();
+    const url = queryString ? `${API_BASE_URL}/notifications?${queryString}` : `${API_BASE_URL}/notifications`;
 
     // 3. Make the API request with the Authorization token
     const response = await fetch(url, {
