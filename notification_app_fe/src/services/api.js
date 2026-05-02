@@ -42,13 +42,13 @@ export const fetchNotifications = async ({ limit, page, notification_type } = {}
     const data = await response.json();
 
     // 4. Log the success using our reusable logging middleware
-    Log('frontend', 'info', 'api', `Successfully fetched notifications for page ${page}.`);
+    Log('frontend', 'info', 'api', 'Notifications fetched successfully');
 
     return data;
 
   } catch (error) {
     // 5. Log the error using our reusable logging middleware
-    Log('frontend', 'error', 'api', `Failed to fetch notifications: ${error.message}`);
+    Log('frontend', 'error', 'api', 'API fetch failed');
     
     // Re-throw the error so the UI component can catch it and show a user-friendly error message
     throw error;

@@ -19,7 +19,8 @@ export const Log = async (stack, level, pkg, message) => {
       stack: stack.toLowerCase(),
       level: level.toLowerCase(),
       package: pkg.toLowerCase(),
-      message,
+      // The API strictly requires the message to be at most 48 characters
+      message: message.length > 48 ? message.substring(0, 45) + '...' : message,
     };
 
     const response = await fetch(apiUrl, {

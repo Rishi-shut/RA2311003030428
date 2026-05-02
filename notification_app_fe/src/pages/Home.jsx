@@ -29,11 +29,11 @@ function Home() {
         setTopNotifications(getTopNotifications(notifArray)); // Process top 10 using our utility
         
         // Log success
-        Log('frontend', 'info', 'page', 'Home page successfully loaded and processed notifications.');
+        Log('frontend', 'info', 'page', 'Home loaded notifications');
       } catch (err) {
         setError(err.message || 'Failed to load notifications from the server.');
         // Log failure
-        Log('frontend', 'error', 'page', `Home page failed to load notifications: ${err.message}`);
+        Log('frontend', 'error', 'page', 'Home failed to load notifications');
       } finally {
         setIsLoading(false);
       }
